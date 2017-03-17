@@ -22,17 +22,24 @@ class Locker {
     this.csrftoken = tokenParser.exec(document.cookie)[1];
 
     let vocabList = $(".vocab-card");
-    let idList = [];
+    let cardList = [];
 
     vocabList.each(function(index) {
-      idList.push($(this).attr("data-vocab-id"));
+      cardList.push($(this));
     });
 
     let i = 0;
-    idList.forEach((value) => {
+    cardList.forEach((value) => {
       setTimeout(() => {
-        this.sendPost("/kw/togglevocab/", this.csrftoken, value).done((response) => {
-        console.log(response);
+        this.sendPost("/kw/togglevocab/", this.csrftoken,
+              value.attr("data-vocab-id")).done((response) => {
+          console.log(value);
+          if (value.attr("class") == "vocab-card ") {
+            value.attr("class", "vocab-card -locked -unlockable ");
+          } else {
+            value.attr("class", "vocab-card ");
+          }
+          console.log(response);
       });}, i * 500);
       i++;
     });
