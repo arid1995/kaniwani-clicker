@@ -1,21 +1,16 @@
-  // ==UserScript==
-  // @name         Kaniwani clicker
-  // @namespace    http://tampermonkey.net/
-  // @version      0.1
-  // @description  shows how to use babel compiler
-  // @author       You
-  // @require      https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.2/babel.js
-  // @require      https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.16.0/polyfill.js
-  // @require http://code.jquery.com/jquery-1.12.4.min.js
-  // @match        https://kaniwani.com/*
-  // ==/UserScript==
+// ==UserScript==
+// @name         Kaniwani clicker
+// @namespace    org.dimwits
+// @version      1.0
+// @description  Clicks it
+// @match        https://kaniwani.com/*
+// @author       Eekone
+// @grant        none
+// @require http://code.jquery.com/jquery-1.12.4.min.js
+// ==/UserScript==
 
-  /* jshint ignore:start */
-  var inline_src = (<><![CDATA[
-  /* jshint ignore:end */
-      /* jshint esnext: false */
-      /* jshint esversion: 6 */
 
+(function() {
   const INTERVAL = 200;
 
   class Locker {
@@ -101,9 +96,5 @@
   }
 
   let clicker = new Locker();
-
-  /* jshint ignore:start */
-  ]]></>).toString();
-  var c = Babel.transform(inline_src, { presets: [ "es2015", "es2016" ] });
-  eval(c.code);
+})();
   /* jshint ignore:end */
