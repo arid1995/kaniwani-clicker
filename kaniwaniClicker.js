@@ -16,9 +16,11 @@
       /* jshint esnext: false */
       /* jshint esversion: 6 */
 
+  const INTERVAL = 200;
+
   class Locker {
     constructor() {
-      let tokenParser = new RegExp("csrftoken=(.*);");
+      let tokenParser = new RegExp("csrftoken=([A-z0-9]+);");
       this.csrftoken = tokenParser.exec(document.cookie)[1];
 
       let vocabList = $(".vocab-card");
@@ -33,13 +35,17 @@
       this.cardList = cardList;
 
       this.createControls();
-
-      console.log(this.csrftoken);
     }
 
     createControls() {
-      this.lockButton = $('<button>Lock</button>');
-      this.unlockButton = $('<button>Unlock</button>');
+      this.lockButton = $(`<button class="btn btn-primary pure-button pure-button-primary"
+      style="margin-left: 10px;">
+      Lock
+      </button>`);
+      this.unlockButton = $(`<button class="btn btn-primary pure-button pure-button-primary"
+      style="margin-left: 10px;">
+      Unlock
+      </button>`);
       $('.vocab-section').prepend(this.lockButton);
       $('.vocab-section').prepend(this.unlockButton);
 
@@ -83,11 +89,11 @@
       this.cardList.forEach((element) => {
         if (locked && element.attr("class") == "vocab-card ") {
           this.sendLockRequest("/kw/togglevocab/",
-                this.csrftoken, element.attr("data-vocab-id"), element, i * 500);
+                this.csrftoken, element.attr("data-vocab-id"), element, i * INTERVAL);
           i++;
         } else if (!locked && element.attr("class") != "vocab-card ") {
           this.sendLockRequest("/kw/togglevocab/",
-                this.csrftoken, element.attr("data-vocab-id"), element, i * 500);
+                this.csrftoken, element.attr("data-vocab-id"), element, i * INTERVAL);
           i++;
         }
       });
