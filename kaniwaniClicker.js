@@ -18,11 +18,23 @@ var inline_src = (<><![CDATA[
 
 class Locker {
   constructor() {
-    let regexp = new RegExp("csrftoken=(.*);");
-    this.csrftoken = regexp.exec(document.cookie)[1];
+    let tokenParser = new RegExp("csrftoken=(.*);");
+    this.csrftoken = tokenParser.exec(document.cookie)[1];
 
-    this.sendPost("/kw/togglevocab/", this.csrftoken, 4855370).done((response) => {
-      console.log(response);
+    let vocabList = $(".vocab-card");
+    let idList = [];
+
+    vocabList.each(function(index) {
+      idList.push($(this).attr("data-vocab-id"));
+    });
+
+    let i = 0;
+    idList.forEach((value) => {
+      setTimeout(() => {
+        this.sendPost("/kw/togglevocab/", this.csrftoken, value).done((response) => {
+        console.log(response);
+      });}, i * 500);
+      i++;
     });
     console.log(this.csrftoken);
   }
