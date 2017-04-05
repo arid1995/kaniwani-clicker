@@ -5,31 +5,39 @@
 // @description  Clicks it
 // @match        https://kaniwani.com/*
 // @author       Eekone
+// @run-at document-end
 // @grant        none
 // @require http://code.jquery.com/jquery-1.12.4.min.js
 // ==/UserScript==
 
 
 (function() {
-  const INTERVAL = 200;
+  const INTERVAL = 1;
 
   class Locker {
-    constructor() {
-      let tokenParser = new RegExp("csrftoken=([A-z0-9]+);");
-      this.csrftoken = tokenParser.exec(document.cookie)[1];
-
-      let vocabList = $(".vocab-card");
+    constructor(csrftoken, isVocabPage, pageUrl = '/') {
+      this.csrftoken = csrftoken;
+      this.isVocabPage = isVocabPage;
       let cardList = [];
 
-      vocabList.each(function(index) {
-        cardList.push($(this));
-      });
+      if (isVocabPage) {
+        let vocabList = $(".vocab-card");
+        vocabList.each(function(index) {
+          cardList.push($(this));
+        });
+      } else {
+        $.get( pageUrl, (data) => {
+          console.log(data);
+        });
+      }
 
       this.taskIds = [];
 
       this.cardList = cardList;
 
-      this.createControls();
+      if (isVocabPage) {
+        this.createControls();
+      }
     }
 
     createControls() {
@@ -41,8 +49,8 @@
       style="margin-left: 10px;">
       Unlock
       </button>`);
-      $('.vocab-section').prepend(this.lockButton);
-      $('.vocab-section').prepend(this.unlockButton);
+      $('.section-heading').prepend(this.lockButton);
+      $('.section-heading').prepend(this.unlockButton);
 
       this.lockButton.on("click", (e) => {
         this.taskIds.forEach((id) => {
@@ -95,6 +103,49 @@
     }
   }
 
-  let clicker = new Locker();
+  class Interface {
+    constructor() {
+      let tokenParser = new RegExp("csrftoken=([A-z0-9]+)");
+      console.log(tokenParser.exec(document.cookie));
+      console.log(document.cookie);
+
+      this.csrftoken = tokenParser.exec(document.cookie)[1];
+
+      this.isVocabPage = true;
+
+      //Determining which page are we on
+      if (window.location.pathname == '/kw/vocabulary/')
+        this.isVocabPage = false;
+
+      //Taking action according to the current page
+      if (this.isVocabPage) {
+        let clicker = new Locker(this.csrftoken, this.isVocabPage);
+      } else {
+        this.createControls();
+      }
+    }
+
+    createControls() {
+      let levelCards = document.querySelectorAll('.wrap');
+
+      console.log(levelCards);
+
+      let index = 1;
+
+      levelCards.forEach((value) => {
+        let lockUnlockButton = document.createElement('button');
+        lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlocked');
+        lockUnlockButton.setAttribute('style', 'left: 70px; bottom: 10px; font-size: 0.5em;');
+        lockUnlockButton.setAttribute('vocabId', index);
+
+        lockUnlockButton.addEventListener('click', (event) => {
+          event.preventDefaultdf();
+          console.log(index);
+        });
+        value.appendChild(lockUnlockButton);
+      });
+    }
+  }
+
+  new Interface();
 })();
-  /* jshint ignore:end */
