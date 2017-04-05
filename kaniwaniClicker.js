@@ -35,7 +35,7 @@
             vocabIds.push(match[1]);
           }
 
-          for (let i = 1; i < vocabIds.length; i++) {
+          for (let i = 0; i < vocabIds.length; i++) {
             let matchLocal = match;
             setTimeout(() => {
               let index = i;
@@ -167,7 +167,9 @@
           event.stopPropagation();
           new Locker(this.csrftoken, false, `/kw/vocabulary/${i}`, () => {
             if (localStorage.getItem(i) === null) return;
-            localStorage.setItem(i, !localStorage.getItem(i));
+            let isLocked = localStorage.getItem(i);
+            let opposite = (isLocked === 'true') ? 'false' : 'true';
+            localStorage.setItem(i, opposite);
             this.changeButtonState(lockUnlockButton, localStorage.getItem(i));
           });
           return false;
