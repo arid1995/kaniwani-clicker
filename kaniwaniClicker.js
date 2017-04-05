@@ -27,7 +27,15 @@
         });
       } else {
         $.get( pageUrl, (data) => {
-          console.log(data);
+          let idParser = new RegExp(`data-vocab-id="([0-9]+)"`, 'g');
+          let match;
+          for (let i = 1;(match = idParser.exec(data)) !== null; i += INTERVAL) {
+            let matchLocal = match;
+            setTimeout(() => {
+              $.post('/kw/togglevocab/', {review_id: matchLocal[1], csrfmiddlewaretoken: this.csrftoken}).done((response) => {
+              });
+            }, i);
+          }
         });
       }
 
@@ -70,6 +78,8 @@
         this.changeLockedStateTo(false);
       });
     }
+
+
 
     sendLockRequest(url, token, reviewId, element, delay) {
       let taskId = setTimeout(() => {
@@ -128,8 +138,6 @@
     createControls() {
       let levelCards = document.querySelectorAll('.wrap');
 
-      console.log(levelCards);
-
       let index = 1;
 
       levelCards.forEach((value) => {
@@ -137,12 +145,16 @@
         lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlocked');
         lockUnlockButton.setAttribute('style', 'left: 70px; bottom: 10px; font-size: 0.5em;');
         lockUnlockButton.setAttribute('vocabId', index);
+        let i = index;
 
         lockUnlockButton.addEventListener('click', (event) => {
-          event.preventDefaultdf();
-          console.log(index);
+          event.preventDefault();
+          event.stopPropagation();
+          new Locker(this.csrftoken, false, `/kw/vocabulary/${i}`);
+          return false;
         });
         value.appendChild(lockUnlockButton);
+        index++;
       });
     }
   }
