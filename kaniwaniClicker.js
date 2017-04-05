@@ -15,7 +15,7 @@
   const INTERVAL = 1;
 
   class Locker {
-    constructor(csrftoken, isVocabPage, pageUrl = '/') {
+    constructor(csrftoken, isVocabPage, pageUrl = '/', requestReady = null) {
       this.csrftoken = csrftoken;
       this.isVocabPage = isVocabPage;
       let cardList = [];
@@ -29,12 +29,20 @@
         $.get( pageUrl, (data) => {
           let idParser = new RegExp(`data-vocab-id="([0-9]+)"`, 'g');
           let match;
-          for (let i = 1;(match = idParser.exec(data)) !== null; i += INTERVAL) {
+          let vocabIds = [];
+
+          for (;(match = idParser.exec(data)) !== null;) {
+            vocabIds.push(match[1]);
+          }
+
+          for (let i = 1; i < vocabIds.length; i++) {
             let matchLocal = match;
             setTimeout(() => {
-              $.post('/kw/togglevocab/', {review_id: matchLocal[1], csrfmiddlewaretoken: this.csrftoken}).done((response) => {
+              let index = i;
+              $.post('/kw/togglevocab/', {review_id: vocabIds[i], csrfmiddlewaretoken: this.csrftoken}).done((response) => {
+                if (i == vocabIds.length - 1) requestReady();
               });
-            }, i);
+            }, i * INTERVAL);
           }
         });
       }
@@ -60,6 +68,10 @@
       $('.section-heading').prepend(this.lockButton);
       $('.section-heading').prepend(this.unlockButton);
 
+      let levelParser = new RegExp('.*([0-9]+)');
+      let path = window.location.pathname;
+      let level = levelParser.exec(path)[1];
+
       this.lockButton.on("click", (e) => {
         this.taskIds.forEach((id) => {
           clearTimeout(id);
@@ -67,6 +79,7 @@
         this.taskIds = [];
 
         this.changeLockedStateTo(true);
+        localStorage.setItem(level, true);
       });
 
       this.unlockButton.on("click", (e) => {
@@ -76,6 +89,7 @@
         this.taskIds = [];
 
         this.changeLockedStateTo(false);
+        localStorage.setItem(level, false);
       });
     }
 
@@ -141,21 +155,37 @@
       let index = 1;
 
       levelCards.forEach((value) => {
+        let i = index;
         let lockUnlockButton = document.createElement('button');
-        lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlocked');
+        this.changeButtonState(lockUnlockButton, localStorage.getItem(i));
+
         lockUnlockButton.setAttribute('style', 'left: 70px; bottom: 10px; font-size: 0.5em;');
         lockUnlockButton.setAttribute('vocabId', index);
-        let i = index;
 
         lockUnlockButton.addEventListener('click', (event) => {
           event.preventDefault();
           event.stopPropagation();
-          new Locker(this.csrftoken, false, `/kw/vocabulary/${i}`);
+          new Locker(this.csrftoken, false, `/kw/vocabulary/${i}`, () => {
+            if (localStorage.getItem(i) === null) return;
+            localStorage.setItem(i, !localStorage.getItem(i));
+            this.changeButtonState(lockUnlockButton, localStorage.getItem(i));
+          });
           return false;
         });
         value.appendChild(lockUnlockButton);
         index++;
       });
+    }
+
+    changeButtonState(lockUnlockButton, state = true) {
+      if (state === 'true') {
+        lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlock');
+      } else if (state === 'false') {
+        lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlocked');
+      } else {
+        lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary');
+        lockUnlockButton.innerHTML = '?';
+      }
     }
   }
 
