@@ -159,7 +159,13 @@
         let lockUnlockButton = document.createElement('button');
         this.changeButtonState(lockUnlockButton, localStorage.getItem(i));
 
-        lockUnlockButton.setAttribute('style', 'left: 70px; bottom: 10px; font-size: 0.5em;');
+        lockUnlockButton.setAttribute('style', `
+        left: 70px; bottom: 10px;
+        font-size: 0.7em;
+        background-color: rgba(236, 68, 255, 1);
+        border-radius: 5px;
+        border: 0px;
+        `);
         lockUnlockButton.setAttribute('vocabId', index);
 
         lockUnlockButton.addEventListener('click', (event) => {
@@ -182,11 +188,13 @@
     changeButtonState(lockUnlockButton, state = true) {
       if (state === 'true') {
         lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlock');
+        lockUnlockButton.setAttribute('disabled', 'false');
       } else if (state === 'false') {
         lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlocked');
+        lockUnlockButton.setAttribute('disabled', 'false');
       } else {
-        lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary');
-        lockUnlockButton.innerHTML = '?';
+        lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-lock');
+        lockUnlockButton.setAttribute('disabled', 'true');
       }
     }
   }
