@@ -188,13 +188,13 @@
     changeButtonState(lockUnlockButton, state = true) {
       if (state === 'true') {
         lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlock');
-        lockUnlockButton.setAttribute('disabled', 'false');
+        lockUnlockButton.removeAttribute('disabled');
       } else if (state === 'false') {
         lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-unlocked');
-        lockUnlockButton.setAttribute('disabled', 'false');
+        lockUnlockButton.removeAttribute('disabled');
       } else {
         lockUnlockButton.setAttribute('class', 'btn btn-primary pure-button-primary icon i-lock');
-        lockUnlockButton.setAttribute('disabled', 'true');
+        lockUnlockButton.setAttribute('disabled', '');
       }
     }
   }
