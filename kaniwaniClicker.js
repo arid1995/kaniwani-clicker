@@ -68,7 +68,7 @@
       $('.section-heading').prepend(this.lockButton);
       $('.section-heading').prepend(this.unlockButton);
 
-      let levelParser = new RegExp('.*([0-9]+)');
+      let levelParser = new RegExp('.*/([0-9]+)');
       let path = window.location.pathname;
       let level = levelParser.exec(path)[1];
 
